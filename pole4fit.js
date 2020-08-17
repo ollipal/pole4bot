@@ -1,31 +1,71 @@
-const browser = await puppeteer.launch();
+const puppeteer = require("puppeteer");
 
-const page = await browser.newPage();
-await page.goto('https://www.polenow.com/pole4fit/index.php?date=1597681194');
-await page.content();
-await page.screenshot({path: 'screenshot.png'});
+(async () => {
+  try {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-/* Run javascript inside of the page */
-  let data = await page.evaluate(() => {
+    await page.goto(
+      "https://www.polenow.com/pole4fit/index.php?date=1597681194"
+    );
+    await page.content();
+    await page.screenshot({ path: "screenshot.png" });
 
-    
-const loc = 'Pasila'
-const day = 'Maanantai'
-const className = 'Poletech 1'
+    let data = await page.evaluate(() => {
+      const loc = "Pasilaaaaaaaa";
+      const day = "Keskiviikko";
+      const className = "Poletech 3";
 
-const locDiv = [...document.querySelector('div[class="CALENDARCONT"]').children]
-.find(l => l.querySelector('div[class="col-md-12 top-buffer text-align"] > h4').innerHTML.toLowerCase().includes(loc.toLowerCase()));
+      getElement = (name, base, fromElements, subElement, includes) => {
+        const element = [
+          ...base.querySelectorAll(fromElements),
+        ].find((element) =>
+          element
+            .querySelector(subElement)
+            .innerHTML.toLowerCase()
+            .includes(includes.toLowerCase())
+        );
+        if (element === undefined) {
+          throw `${name} ${includes} was not found`;
+        }
+        return element;
+      };
 
-const dayDiv = [...locDiv.querySelectorAll('div[class="panel panel-default day-panel"]')]
-.find(d => d.querySelector('div[class="panel-heading"] > div[class="panel-heading"]').innerHTML.toLowerCase().includes(day.toLowerCase()));
+      const locDiv = getElement(
+        "loc",
+        document,
+        'div[class="CALENDARCONT"] > div',
+        'div[class="col-md-12 top-buffer text-align"] > h4',
+        loc
+      );
 
-const classDiv = [...dayDiv.querySelectorAll('div[role="alert"]')]
-.find(c => c.querySelector('div[class="classbutton"]').innerHTML.toLowerCase().includes(className.toLowerCase()));
+      const dayDiv = getElement(
+        "day",
+        locDiv,
+        'div[class="panel panel-info day-panel"], div[class="panel panel-default day-panel"]',
+        'div[class="panel-heading"] > div[class="panel-heading"]',
+        day
+      );
 
-return classDiv.querySelector('div[class="classbutton"]').innerText.split(/\r?\n/).slice(-1)[0] === "Tilaa"
- });
+      const classDiv = getElement(
+        "className",
+        dayDiv,
+        'div[role="alert"]',
+        'div[class="classbutton"]',
+        className
+      );
 
-console.log(data)
+      return (
+        classDiv
+          .querySelector('div[class="classbutton"]')
+          .innerText.split(/\r?\n/)
+          .slice(-1)[0] === "Tilaa"
+      );
+    });
 
-
-await browser.close();
+    await browser.close();
+    console.log(data);
+  } catch (e) {
+    console.error(e.message);
+  }
+})();

@@ -1,0 +1,22 @@
+{
+  "name": "pole4fit-space-left-notifier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pole4fit.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ollipal/pole4fit-space-left-notifier.git"
+  },
+  "author": "Olli Paloviita",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ollipal/pole4fit-space-left-notifier/issues"
+  },
+  "homepage": "https://github.com/ollipal/pole4fit-space-left-notifier#readme",
+  "dependencies": {
+    "puppeteer": "^5.2.1"
+  }
+}
