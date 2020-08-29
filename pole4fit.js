@@ -2,7 +2,10 @@ const puppeteer = require("puppeteer");
 
 (async () => {
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox"],
+    });
     const page = await browser.newPage();
 
     await page.goto(
@@ -67,5 +70,8 @@ const puppeteer = require("puppeteer");
     console.log(data);
   } catch (e) {
     console.error(e.message);
+    console.log("noice");
+    //throw "sdfsdfsdf";
+    process.exit();
   }
 })();
