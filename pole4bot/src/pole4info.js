@@ -7,6 +7,13 @@ const getBrowser = async () => {
   });
 };
 
+const getPage = async (browser) => {
+  const page = await browser.newPage();
+  await page.goto("https://www.polenow.com/pole4fit/index.php");
+  await page.content();
+  return page;
+};
+
 const getStatus = async (browser, msg) => {
   const { hasSpace, date, location, day, className } = await getInfo(
     browser,
@@ -21,13 +28,9 @@ https://www.polenow.com/calendarday.php?day=${date}`;
   }
 };
 
-const getInfo = async (browser, msg) => {
-  const { location, day, className } = parseMsg(msg);
-  const page = await browser.newPage();
-
-  await page.goto("https://www.polenow.com/pole4fit/index.php");
-  await page.content();
-  await page.screenshot({ path: "screenshot.png" });
+const getInfo = async (browser, msgText) => {
+  const { location, day, className } = parseMsg(msgText);
+  const page = await getPage(browser);
   return await page.evaluate(
     ({ location, day, className }) => {
       getElement = (name, base, fromElements, subElement, includes) => {
@@ -89,8 +92,7 @@ const getInfo = async (browser, msg) => {
   );
 };
 
-const parseMsg = (msg) => {
-  const msgText = msg.text.toString();
+const parseMsg = (msgText) => {
   const msgParts = msgText.split("/");
   if (msgParts.length !== 3) {
     throw `Cannot parse message '${msgText}'`;

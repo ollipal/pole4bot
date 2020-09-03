@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  pole4bot:
+    build: ./pole4bot
+    restart: always
+  json-server:
+    image: vimagick/json-server
+    command: -H 0.0.0.0 -p 3000 -w db.json
+    ports:
+        - "3000:3000"
+    volumes:
+        - ./data:/data
+    restart: always

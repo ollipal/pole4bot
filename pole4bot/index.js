@@ -1,15 +1,19 @@
 process.env.NTBA_FIX_319 = 1; //bug fix: https://github.com/yagop/node-telegram-bot-api/issues/319
 const TelegramBot = require("node-telegram-bot-api");
 require("dotenv").config();
-const pole4info = require("./pole4info");
+const pole4info = require("./src/pole4info");
+const polling = require("./src/polling");
 
 (async () => {
   const bot = new TelegramBot(process.env.BOT_TOKEN, {
     polling: true,
   });
   const browser = await pole4info.getBrowser();
+  polling.startPolling(bot, browser, 253621152);
 
   bot.on("message", (msg) => {
+    console.log(msg.chat.id);
+    console.log(msg);
     (async () => {
       switch (msg.text.toString()) {
         case "/start":
@@ -44,7 +48,7 @@ for example: \`Pasila/Keskiviikko/Poletech 3\`
 
 const reply = async (bot, msg, browser) => {
   try {
-    bot.sendMessage(msg.chat.id, await pole4info.getStatus(browser, msg));
+    bot.sendMessage(msg.chat.id, await pole4info.getStatus(browser, msg.text));
   } catch (e) {
     bot.sendMessage(msg.chat.id, e.toString());
     help(bot, msg);

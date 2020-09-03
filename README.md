@@ -10,12 +10,11 @@ the current lesson status.
 Add `@pole4bot` in Telegram for detailed instructions.
 
 ## Setup
-Create a `.env` file with a Telegram bot token `BOT_TOKEN=...` that has been
-gotten from https://t.me/botfather . 
+Create a `.env` file to `pole4bot/` with a Telegram bot token `BOT_TOKEN=...`
+that has been gotten from https://t.me/botfather . 
 
-Then install Docker: https://docs.docker.com/get-docker/
+Install Docker: https://docs.docker.com/get-docker/
+and Docker Compose: https://docs.docker.com/compose/install/
 
-Build & run the container for example with:
-`docker build -t pole4bot . && docker run pole4bot`  
-
-(`docker kill $(docker ps -q)` will kill all running containers)
+Then build & run the containers with:
+`docker-compose build && docker-compose up`

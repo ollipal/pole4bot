@@ -8,15 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ollipal/pole4fit-space-left-notifier.git"
+    "url": "git+https://github.com/ollipal/pole4bot.git"
   },
   "author": "Olli Paloviita",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ollipal/pole4fit-space-left-notifier/issues"
+    "url": "https://github.com/ollipal/pole4bot/issues"
   },
-  "homepage": "https://github.com/ollipal/pole4fit-space-left-notifier#readme",
+  "homepage": "https://github.com/ollipal/pole4bot#readme",
   "dependencies": {
+    "axios": "^0.20.0",
     "dotenv": "^8.2.0",
     "node-telegram-bot-api": "^0.50.0",
     "puppeteer": "^5.2.1"
