@@ -1,12 +1,6 @@
 const axios = require("axios");
 const baseUrl = "http://json-server:3000";
 
-const validateWeek = (week) => {
-  if (!["current", "next", "nextnext"].includes(week)) {
-    throw `${week} not in ["current", "next", "nextnext"]`;
-  }
-};
-
 const getUsers = () => {
   const request = axios.get(`${baseUrl}/users`);
   return request.then((response) => response.data);
@@ -21,9 +15,8 @@ const createUser = (id, name, username) => {
   return request.then((response) => response.data);
 };
 
-const createPoll = (week, user, command, status) => {
-  validateWeek(week);
-  const request = axios.post(`${baseUrl}/${week}`, {
+const createPoll = (user, command, status) => {
+  const request = axios.post(`${baseUrl}/polls`, {
     user,
     command,
     status,
@@ -31,9 +24,8 @@ const createPoll = (week, user, command, status) => {
   return request.then((response) => response.data);
 };
 
-const updatePollStatus = (week, poll, status) => {
-  validateWeek(week);
-  const request = axios.put(`${baseUrl}/${week}/${poll.id}`, {
+const updatePollStatus = (poll, status) => {
+  const request = axios.put(`${baseUrl}/polls/${poll.id}`, {
     user: poll.user,
     command: poll.command,
     status,
@@ -41,9 +33,8 @@ const updatePollStatus = (week, poll, status) => {
   return request.then((response) => response.data);
 };
 
-const getPolls = (week) => {
-  validateWeek(week);
-  const request = axios.get(`${baseUrl}/${week}`);
+const getPolls = () => {
+  const request = axios.get(`${baseUrl}/polls`);
   return request.then((response) => response.data);
 };
 

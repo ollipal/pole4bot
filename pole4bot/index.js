@@ -71,7 +71,7 @@ const poll = async (bot, msg, browser) => {
     await pole4info.getPage(browser),
     command
   );
-  await db.createPoll("current", msg.from.id, command, status);
+  await db.createPoll(msg.from.id, command, status);
   bot.sendMessage(msg.chat.id, `Polling started for '${command}':\n${status}`);
 };
 

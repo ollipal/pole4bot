@@ -6,7 +6,7 @@ const startPolling = async (bot, browser) => {
   while (true) {
     try {
       const page = await pole4info.getPage(browser);
-      await pollWeek("current", page, bot);
+      await pollAll(page, bot);
     } catch (e) {
       console.warn(`Polling error: ${e}`);
     }
@@ -14,13 +14,13 @@ const startPolling = async (bot, browser) => {
   }
 };
 
-const pollWeek = async (week, page, bot) => {
-  for (poll of await db.getPolls(week)) {
+const pollAll = async (page, bot) => {
+  for (poll of await db.getPolls()) {
     console.log(`Polling '${poll.command}'`);
     const status = await pole4info.getStatus(page, poll.command);
     console.log(status);
     if (poll.status !== status) {
-      await db.updatePollStatus(week, poll, status);
+      await db.updatePollStatus(poll, status);
       if (!status.endsWith(pole4info.PAST_POSTFIX)) {
         bot.sendMessage(poll.user, status);
       }
