@@ -72,13 +72,7 @@ const poll = async (bot, msg, browser) => {
     command
   );
   await db.createPoll("current", msg.from.id, command, status);
-  bot.sendMessage(
-    msg.chat.id,
-    `Polling started for '\`${command}\`':\n${status}`,
-    {
-      parse_mode: "MarkdownV2",
-    }
-  );
+  bot.sendMessage(msg.chat.id, `Polling started for '${command}':\n${status}`);
 };
 
 const reply = async (bot, msg, browser) => {

@@ -1,4 +1,7 @@
 const puppeteer = require("puppeteer");
+var moment = require("moment");
+
+const PAST_POSTFIX = "is in the past";
 
 const getBrowser = async () => {
   return await puppeteer.launch({
@@ -20,6 +23,9 @@ const getStatus = async (page, msg) => {
       page,
       msg
     );
+    if (moment(date, "DD.MM.YYYY").isBefore(moment(), "Day")) {
+      return `${className} on ${day} ${date} in ${location} ${PAST_POSTFIX}`;
+    }
     if (hasSpace) {
       return `${className} on ${day} ${date} in ${location} has space!
 https://www.polenow.com/calendarday.php?day=${date}`;
@@ -107,6 +113,7 @@ const parseCommand = (command) => {
 };
 
 module.exports = {
+  PAST_POSTFIX,
   getBrowser,
   getPage,
   getStatus,

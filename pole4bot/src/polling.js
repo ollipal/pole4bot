@@ -21,7 +21,9 @@ const pollWeek = async (week, page, bot) => {
     console.log(status);
     if (poll.status !== status) {
       await db.updatePollStatus(week, poll, status);
-      bot.sendMessage(poll.user, status);
+      if (!status.endsWith(pole4info.PAST_POSTFIX)) {
+        bot.sendMessage(poll.user, status);
+      }
     }
   }
 };
