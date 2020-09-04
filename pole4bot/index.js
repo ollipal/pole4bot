@@ -15,9 +15,8 @@ const db = require("./src/db");
   polling.startPolling(bot, browser);
 
   bot.on("message", (msg) => {
-    console.log(msg.chat.id);
-    console.log(msg);
     (async () => {
+      await addUserIfNew(msg);
       try {
         const command = msg.text.split(" ")[0];
         switch (command) {
@@ -42,8 +41,7 @@ const db = require("./src/db");
   });
 })();
 
-const start = async (bot, msg) => {
-  // create new user if new
+const addUserIfNew = async (msg) => {
   if (!(await db.getUser(msg.from.id))) {
     console.log(`Creating new user ${msg.from.username}`);
     await db.createUser(
@@ -52,7 +50,9 @@ const start = async (bot, msg) => {
       msg.from.username
     );
   }
-  // greet
+};
+
+const start = async (bot, msg) => {
   bot.sendMessage(msg.chat.id, "Welcome to pole4bot!");
   help(bot, msg);
 };
