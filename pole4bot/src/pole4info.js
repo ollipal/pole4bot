@@ -14,23 +14,25 @@ const getPage = async (browser) => {
   return page;
 };
 
-const getStatus = async (browser, msg) => {
-  const { hasSpace, date, location, day, className } = await getInfo(
-    browser,
-    msg
-  );
-  console.log(date);
-  if (hasSpace) {
-    return `${className} on ${day} ${date} in ${location} has spots left!
+const getStatus = async (page, msg) => {
+  try {
+    const { hasSpace, date, location, day, className } = await getInfo(
+      page,
+      msg
+    );
+    if (hasSpace) {
+      return `${className} on ${day} ${date} in ${location} has space!
 https://www.polenow.com/calendarday.php?day=${date}`;
-  } else {
-    return `${className} ${day} ${date} in ${location} is now full :(`;
+    } else {
+      return `${className} ${day} ${date} in ${location} is full :(`;
+    }
+  } catch (e) {
+    return e;
   }
 };
 
-const getInfo = async (browser, msgText) => {
-  const { location, day, className } = parseMsg(msgText);
-  const page = await getPage(browser);
+const getInfo = async (page, command) => {
+  const { location, day, className } = parseCommand(command);
   return await page.evaluate(
     ({ location, day, className }) => {
       getElement = (name, base, fromElements, subElement, includes) => {
@@ -92,15 +94,20 @@ const getInfo = async (browser, msgText) => {
   );
 };
 
-const parseMsg = (msgText) => {
-  const msgParts = msgText.split("/");
-  if (msgParts.length !== 3) {
-    throw `Cannot parse message '${msgText}'`;
+const parseCommand = (command) => {
+  const commandParts = command.split("/");
+  if (commandParts.length !== 3) {
+    throw `Cannot parse command '${command}'`;
   }
-  return { location: msgParts[0], day: msgParts[1], className: msgParts[2] };
+  return {
+    location: commandParts[0],
+    day: commandParts[1],
+    className: commandParts[2],
+  };
 };
 
 module.exports = {
   getBrowser,
+  getPage,
   getStatus,
 };

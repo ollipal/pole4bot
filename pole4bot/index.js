@@ -1,35 +1,58 @@
-process.env.NTBA_FIX_319 = 1; //bug fix: https://github.com/yagop/node-telegram-bot-api/issues/319
+//bug fix: https://github.com/yagop/node-telegram-bot-api/issues/319
+process.env.NTBA_FIX_319 = 1;
+
 const TelegramBot = require("node-telegram-bot-api");
 require("dotenv").config();
 const pole4info = require("./src/pole4info");
 const polling = require("./src/polling");
+const db = require("./src/db");
 
 (async () => {
   const bot = new TelegramBot(process.env.BOT_TOKEN, {
     polling: true,
   });
   const browser = await pole4info.getBrowser();
-  polling.startPolling(bot, browser, 253621152);
+  polling.startPolling(bot, browser);
 
   bot.on("message", (msg) => {
     console.log(msg.chat.id);
     console.log(msg);
     (async () => {
-      switch (msg.text.toString()) {
-        case "/start":
-          greet(bot, msg);
-          break;
-        case "/help":
-          help(bot, msg);
-          break;
-        default:
-          await reply(bot, msg, browser);
+      try {
+        const command = msg.text.split(" ")[0];
+        switch (command) {
+          case "/start":
+            await start(bot, msg);
+            break;
+          case "/help":
+            help(bot, msg);
+            break;
+          case "/poll":
+            await poll(bot, msg, browser);
+            break;
+          default:
+            await reply(bot, msg, browser);
+        }
+      } catch (e) {
+        console.log(e);
+        bot.sendMessage(msg.chat.id, e);
+        help(bot, msg);
       }
     })();
   });
 })();
 
-const greet = (bot, msg) => {
+const start = async (bot, msg) => {
+  // create new user if new
+  if (!(await db.getUser(msg.from.id))) {
+    console.log(`Creating new user ${msg.from.username}`);
+    await db.createUser(
+      msg.from.id,
+      `${msg.from.first_name} ${msg.from.last_name}`,
+      msg.from.username
+    );
+  }
+  // greet
   bot.sendMessage(msg.chat.id, "Welcome to pole4bot!");
   help(bot, msg);
 };
@@ -37,20 +60,30 @@ const greet = (bot, msg) => {
 const help = (bot, msg) => {
   bot.sendMessage(
     msg.chat.id,
-    `
-usage: \`location/day/className\`
-for example: \`Pasila/Keskiviikko/Poletech 3\`
-
-\\(multiple identical classNames on the same day is not currently supported\\)`,
+    `usage: \`location/day/className\`\nfor example: \`Pasila/Keskiviikko/Poletech 3\``,
     { parse_mode: "MarkdownV2" }
   );
 };
 
+const poll = async (bot, msg, browser) => {
+  const command = msg.text.split(" ")[1];
+  const status = await pole4info.getStatus(
+    await pole4info.getPage(browser),
+    command
+  );
+  await db.createPoll("current", msg.from.id, command, status);
+  bot.sendMessage(
+    msg.chat.id,
+    `Polling started for '\`${command}\`':\n${status}`,
+    {
+      parse_mode: "MarkdownV2",
+    }
+  );
+};
+
 const reply = async (bot, msg, browser) => {
-  try {
-    bot.sendMessage(msg.chat.id, await pole4info.getStatus(browser, msg.text));
-  } catch (e) {
-    bot.sendMessage(msg.chat.id, e.toString());
-    help(bot, msg);
-  }
+  bot.sendMessage(
+    msg.chat.id,
+    await pole4info.getStatus(await pole4info.getPage(browser), msg.text)
+  );
 };
