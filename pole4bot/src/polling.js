@@ -6,17 +6,23 @@ const startPolling = async (bot, browser) => {
   while (true) {
     try {
       const page = await pole4info.getPage(browser);
-      // poll current week
-      for (poll of await db.getPolls("current")) {
-        console.log(`Polling ${poll}`);
-        const status = await pole4info.getStatus(page, poll.command);
-        console.log(status);
-        bot.sendMessage(poll.user, status);
-      }
+      await pollWeek("current", page, bot);
     } catch (e) {
       console.warn(`Polling error: ${e}`);
     }
     await sleep(POLLING_FREQ_MS);
+  }
+};
+
+const pollWeek = async (week, page, bot) => {
+  for (poll of await db.getPolls(week)) {
+    console.log(`Polling '${poll.command}'`);
+    const status = await pole4info.getStatus(page, poll.command);
+    console.log(status);
+    if (poll.status !== status) {
+      await db.updatePollStatus(week, poll, status);
+      bot.sendMessage(poll.user, status);
+    }
   }
 };
 

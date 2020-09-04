@@ -31,6 +31,16 @@ const createPoll = (week, user, command, status) => {
   return request.then((response) => response.data);
 };
 
+const updatePollStatus = (week, poll, status) => {
+  validateWeek(week);
+  const request = axios.put(`${baseUrl}/${week}/${poll.id}`, {
+    user: poll.user,
+    command: poll.command,
+    status,
+  });
+  return request.then((response) => response.data);
+};
+
 const getPolls = (week) => {
   validateWeek(week);
   const request = axios.get(`${baseUrl}/${week}`);
@@ -41,5 +51,6 @@ module.exports = {
   getUser,
   createUser,
   createPoll,
+  updatePollStatus,
   getPolls,
 };
