@@ -67,7 +67,7 @@ const help = (bot, msg) => {
 
 const poll = async (bot, msg, browser) => {
   const command = msg.text.substr(msg.text.indexOf(" ") + 1);
-  const { reply, statuses } = await pole4info.getReplyAndShortStatuses(
+  const { reply, statuses } = await pole4info.getReplyAndStatuses(
     command,
     browser
   );
@@ -76,6 +76,6 @@ const poll = async (bot, msg, browser) => {
 };
 
 const reply = async (bot, msg, browser) => {
-  const { reply } = await pole4info.getReplyAndShortStatuses(msg.text, browser);
+  const { reply } = await pole4info.getReplyAndStatuses(msg.text, browser);
   bot.sendMessage(msg.chat.id, reply);
 };

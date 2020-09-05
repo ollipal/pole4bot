@@ -16,20 +16,35 @@ const createUser = (id, name, username) => {
 };
 
 const createPoll = (user, command, statuses) => {
-  validateStatuses(statuses);
-  const { shortStatusThis, shortStatusNext, shortStatusNextNext } = statuses;
   const request = axios.post(`${baseUrl}/polls`, {
     user,
     command,
-    shortStatusThis,
-    shortStatusNext,
-    shortStatusNextNext,
+    shortStatusThis: statuses.statusThis.shortStatus,
+    shortStatusNext: statuses.statusNext.shortStatus,
+    shortStatusNextNext: statuses.statusNextNext.shortStatus,
   });
   return request.then((response) => response.data);
 };
 
+const updatePollStatus = async (poll, statuses) => {
+  const request = axios.put(`${baseUrl}/polls/${poll.id}`, {
+    user: poll.user,
+    command: poll.command,
+    shortStatusThis: statuses.shortStatusThis
+      ? statuses.shortStatusThis
+      : poll.shortStatusThis,
+    shortStatusNext: statuses.shortStatusNext
+      ? statuses.shortStatusNext
+      : poll.shortStatusNext,
+    shortStatusNextNext: statuses.shortStatusNextNext
+      ? statuses.shortStatusNextNext
+      : poll.shortStatusNextNext,
+  });
+  return request.then((response) => response.data);
+};
+
+/*
 const updatePollStatus = (poll, statuses) => {
-  validateStatuses(statuses);
   const { shortStatusThis, shortStatusNext, shortStatusNextNext } = statuses;
   const request = axios.put(`${baseUrl}/polls/${poll.id}`, {
     user: poll.user,
@@ -40,21 +55,7 @@ const updatePollStatus = (poll, statuses) => {
   });
   return request.then((response) => response.data);
 };
-
-const validateStatuses = (statuses) => {
-  console.log(statuses);
-  console.log(statuses.shortStatusThis);
-  // make sure that only one or all statuses are defined
-  const undefinedStatusesAmount = [
-    statuses.shortStatusThis,
-    statuses.shortStatusNext,
-    statuses.shortStatusNextNext,
-  ].filter((status) => status !== undefined).length;
-  if (![1, 3].includes(undefinedStatusesAmount)) {
-    throw `Wrong amount of statuses defined ${undefinedStatusesAmount}`;
-  }
-};
-
+*/
 const getPolls = () => {
   const request = axios.get(`${baseUrl}/polls`);
   return request.then((response) => response.data);

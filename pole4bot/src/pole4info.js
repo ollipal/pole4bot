@@ -69,15 +69,26 @@ const getStatus = async (page, command) => {
 };
 
 const getStatuses = async (page, command, week) => {
-  const statusThis = await getStatus(page, command);
-  let statusNext, statusNextNext;
+  // all statuses to "-" initially
+  let statusThis, statusNext, statusNextNext;
+  statusThis = statusNext = statusNextNext = {
+    longStatus: "-",
+    shortStatus: "-",
+  };
+  if (week === undefined || week === "this") {
+    statusThis = await getStatus(page, command);
+  }
   // load only the required pages
   if (week !== "this") {
     page = await getNextWeek(page);
-    statusNext = await getStatus(page, command);
+    if (week === undefined || week === "next") {
+      statusNext = await getStatus(page, command);
+    }
     if (week !== "next") {
       page = await getNextWeek(page);
-      statusNextNext = await getStatus(page, command);
+      if (week === undefined || week === "nextnext") {
+        statusNextNext = await getStatus(page, command);
+      }
     }
   }
   return { statusThis, statusNext, statusNextNext };
@@ -146,14 +157,13 @@ const getInfo = async (page, command) => {
   );
 };
 
-const getReplyAndShortStatuses = async (command, browser) => {
+const getReplyAndStatuses = async (command, browser) => {
   // get command parts, and also fail immediatly if not parseable
   const { location, day, className, week } = parseCommand(command);
 
   // get statuses
   let page = await getPage(browser);
   const statuses = await getStatuses(page, command, week);
-  console.log(`STATUSES ${statuses.statusThis}`);
 
   // get reply
   let reply;
@@ -206,6 +216,6 @@ module.exports = {
   getNextWeek,
   getStatus,
   getStatuses,
-  getReplyAndShortStatuses,
+  getReplyAndStatuses,
   parseCommand,
 };
