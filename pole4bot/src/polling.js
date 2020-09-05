@@ -84,10 +84,75 @@ const updatePollAndSendMessageIfNeeded = async (
   }
 };
 
+const showPolls = async (bot, user) => {
+  const polls = await db.getPolls();
+  let i = 1;
+  let reply = "Polls:\n";
+  for (poll of polls) {
+    if (poll.user !== user) {
+      continue;
+    }
+    reply += `\n[${i}] ${poll.command}:\n`;
+    if (poll.shortStatusThis !== "-") {
+      reply += `this: ${poll.shortStatusThis}\n`;
+    }
+    if (poll.shortStatusNext !== "-") {
+      reply += `next: ${poll.shortStatusNext}\n`;
+    }
+    if (poll.shortStatusNextNext !== "-") {
+      reply += `nextnext: ${poll.shortStatusNextNext}\n`;
+    }
+    i++;
+  }
+  if (reply === "Polls:\n") {
+    reply = "No active polls";
+  }
+  bot.sendMessage(user, reply);
+};
+
+const createPoll = async (command, user, bot, browser) => {
+  const { reply, statuses } = await pole4info.getReplyAndStatuses(
+    command,
+    browser
+  );
+  await db.createPoll(user, command, statuses);
+  bot.sendMessage(user, `Polling started for '${command}':\n${reply}`);
+};
+
+const removePoll = async (index, bot, user) => {
+  const polls = await db.getPolls();
+  let i = 1;
+  let id = undefined;
+  for (poll of polls) {
+    if (poll.user !== user) {
+      continue;
+    }
+    if (i === index) {
+      id = poll.id;
+      break;
+    }
+    i++;
+  }
+  if (id === undefined) {
+    bot.sendMessage(user, `Poll [${index}] not found, check /poll`);
+    return;
+  }
+  try {
+    await db.deletePoll(id);
+    bot.sendMessage(user, `Poll [${index}] removed`);
+  } catch (e) {
+    bot.sendMessage(user, `Poll [${index}] could not be removed`);
+    console.warn(e);
+  }
+};
+
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 module.exports = {
   startPolling,
+  showPolls,
+  createPoll,
+  removePoll,
 };

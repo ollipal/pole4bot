@@ -29,6 +29,9 @@ const db = require("./src/db");
           case "/poll":
             await poll(bot, msg, browser);
             break;
+          case "/rm":
+            await rm(bot, msg, browser);
+            break;
           default:
             await reply(bot, msg, browser);
         }
@@ -67,12 +70,21 @@ const help = (bot, msg) => {
 
 const poll = async (bot, msg, browser) => {
   const command = msg.text.substr(msg.text.indexOf(" ") + 1);
-  const { reply, statuses } = await pole4info.getReplyAndStatuses(
-    command,
-    browser
-  );
-  await db.createPoll(msg.from.id, command, statuses);
-  bot.sendMessage(msg.chat.id, `Polling started for '${command}':\n${reply}`);
+  if (command === "/poll") {
+    await polling.showPolls(bot, msg.from.id);
+  } else {
+    await polling.createPoll(command, msg.from.id, bot, browser);
+  }
+};
+
+const rm = async (bot, msg, browser) => {
+  const command = msg.text.substr(msg.text.indexOf(" ") + 1);
+  if (command === "/rm") {
+    bot.sendMessage(msg.chat.id, "No index was given");
+  } else {
+    const index = parseInt(command);
+    await polling.removePoll(index, bot, msg.from.id);
+  }
 };
 
 const reply = async (bot, msg, browser) => {

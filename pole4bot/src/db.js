@@ -26,6 +26,11 @@ const createPoll = (user, command, statuses) => {
   return request.then((response) => response.data);
 };
 
+const deletePoll = (id) => {
+  const request = axios.delete(`${baseUrl}/polls/${id}`);
+  return request.then((response) => response.data);
+};
+
 const updatePollStatus = async (poll, statuses) => {
   const request = axios.put(`${baseUrl}/polls/${poll.id}`, {
     user: poll.user,
@@ -43,19 +48,6 @@ const updatePollStatus = async (poll, statuses) => {
   return request.then((response) => response.data);
 };
 
-/*
-const updatePollStatus = (poll, statuses) => {
-  const { shortStatusThis, shortStatusNext, shortStatusNextNext } = statuses;
-  const request = axios.put(`${baseUrl}/polls/${poll.id}`, {
-    user: poll.user,
-    command: poll.command,
-    shortStatusThis,
-    shortStatusNext,
-    shortStatusNextNext,
-  });
-  return request.then((response) => response.data);
-};
-*/
 const getPolls = () => {
   const request = axios.get(`${baseUrl}/polls`);
   return request.then((response) => response.data);
@@ -65,6 +57,7 @@ module.exports = {
   getUser,
   createUser,
   createPoll,
+  deletePoll,
   updatePollStatus,
   getPolls,
 };
