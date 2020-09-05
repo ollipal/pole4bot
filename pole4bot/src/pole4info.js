@@ -17,6 +17,18 @@ const getPage = async (browser) => {
   return page;
 };
 
+const getNextWeek = async (page) => {
+  await page.evaluate(() => {
+    [...document.querySelectorAll('a[class="btn btn-sm btn-default"]')]
+      .find((element) =>
+        element.querySelector('span[class="glyphicon glyphicon-chevron-right"]')
+      )
+      .click();
+  });
+  await page.waitForSelector('div[class="panel-body"]');
+  return page;
+};
+
 const getStatus = async (page, msg) => {
   try {
     const { hasSpace, date, location, day, className } = await getInfo(
@@ -116,5 +128,6 @@ module.exports = {
   PAST_POSTFIX,
   getBrowser,
   getPage,
+  getNextWeek,
   getStatus,
 };

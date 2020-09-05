@@ -76,8 +76,15 @@ const poll = async (bot, msg, browser) => {
 };
 
 const reply = async (bot, msg, browser) => {
+  let page = await pole4info.getPage(browser);
+  const statusThisWeek = await pole4info.getStatus(page, msg.text);
+  page = await pole4info.getNextWeek(page);
+  const statusNextWeek = await pole4info.getStatus(page, msg.text);
+  page = await pole4info.getNextWeek(page);
+  const statusNextNextWeek = await pole4info.getStatus(page, msg.text);
+
   bot.sendMessage(
     msg.chat.id,
-    await pole4info.getStatus(await pole4info.getPage(browser), msg.text)
+    `${statusThisWeek}\n\n${statusNextWeek}\n\n${statusNextNextWeek}`
   );
 };
