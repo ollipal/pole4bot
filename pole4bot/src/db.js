@@ -15,22 +15,44 @@ const createUser = (id, name, username) => {
   return request.then((response) => response.data);
 };
 
-const createPoll = (user, command, status) => {
+const createPoll = (user, command, statuses) => {
+  validateStatuses(statuses);
+  const { shortStatusThis, shortStatusNext, shortStatusNextNext } = statuses;
   const request = axios.post(`${baseUrl}/polls`, {
     user,
     command,
-    status,
+    shortStatusThis,
+    shortStatusNext,
+    shortStatusNextNext,
   });
   return request.then((response) => response.data);
 };
 
-const updatePollStatus = (poll, status) => {
+const updatePollStatus = (poll, statuses) => {
+  validateStatuses(statuses);
+  const { shortStatusThis, shortStatusNext, shortStatusNextNext } = statuses;
   const request = axios.put(`${baseUrl}/polls/${poll.id}`, {
     user: poll.user,
     command: poll.command,
-    status,
+    shortStatusThis,
+    shortStatusNext,
+    shortStatusNextNext,
   });
   return request.then((response) => response.data);
+};
+
+const validateStatuses = (statuses) => {
+  console.log(statuses);
+  console.log(statuses.shortStatusThis);
+  // make sure that only one or all statuses are defined
+  const undefinedStatusesAmount = [
+    statuses.shortStatusThis,
+    statuses.shortStatusNext,
+    statuses.shortStatusNextNext,
+  ].filter((status) => status !== undefined).length;
+  if (![1, 3].includes(undefinedStatusesAmount)) {
+    throw `Wrong amount of statuses defined ${undefinedStatusesAmount}`;
+  }
 };
 
 const getPolls = () => {

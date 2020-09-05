@@ -25,32 +25,66 @@ const getNextWeek = async (page) => {
       )
       .click();
   });
-  await page.waitForSelector('div[class="panel-body"]');
+  const reqElements = [
+    'div[class="CALENDARCONT"] > div',
+    'div[class="panel panel-info day-panel"], div[class="panel panel-default day-panel"]',
+    'div[role="alert"]',
+  ];
+  for (elem of reqElements) {
+    await page.waitForSelector(elem);
+  }
   return page;
 };
 
-const getStatus = async (page, msg) => {
+const getStatus = async (page, command) => {
   try {
     const { hasSpace, date, location, day, className } = await getInfo(
       page,
-      msg
+      command
     );
     if (moment(date, "DD.MM.YYYY").isBefore(moment(), "Day")) {
-      return `${className} on ${day} ${date} in ${location} ${PAST_POSTFIX}`;
+      return {
+        longStatus: `${className} on ${day} ${date} in ${location} ${PAST_POSTFIX}`,
+        shortStatus: `${date} ${PAST_POSTFIX}`,
+      };
     }
     if (hasSpace) {
-      return `${className} on ${day} ${date} in ${location} has space!
-https://www.polenow.com/calendarday.php?day=${date}`;
+      return {
+        longStatus: `${className} on ${day} ${date} in ${location} has space!\nhttps://www.polenow.com/calendarday.php?day=${date}`,
+        shortStatus: `${date} has space\n(https://www.polenow.com/calendarday.php?day=${date})`,
+      };
     } else {
-      return `${className} ${day} ${date} in ${location} is full :(`;
+      return {
+        longStatus: `${className} ${day} ${date} in ${location} is full :(`,
+        shortStatus: `${date} is full`,
+      };
     }
   } catch (e) {
-    return e;
+    // shorten if multiline-errors
+    return {
+      longStatus: e.toString().split("\n")[0],
+      shortStatus: e.toString().split("\n")[0],
+    };
   }
 };
 
+const getStatuses = async (page, command, week) => {
+  const statusThis = await getStatus(page, command);
+  let statusNext, statusNextNext;
+  // load only the required pages
+  if (week !== "this") {
+    page = await getNextWeek(page);
+    statusNext = await getStatus(page, command);
+    if (week !== "next") {
+      page = await getNextWeek(page);
+      statusNextNext = await getStatus(page, command);
+    }
+  }
+  return { statusThis, statusNext, statusNextNext };
+};
+
 const getInfo = async (page, command) => {
-  const { location, day, className } = parseCommand(command);
+  const { location, day, className, week } = parseCommand(command);
   return await page.evaluate(
     ({ location, day, className }) => {
       getElement = (name, base, fromElements, subElement, includes) => {
@@ -112,15 +146,56 @@ const getInfo = async (page, command) => {
   );
 };
 
+const getReplyAndShortStatuses = async (command, browser) => {
+  // get command parts, and also fail immediatly if not parseable
+  const { location, day, className, week } = parseCommand(command);
+
+  // get statuses
+  let page = await getPage(browser);
+  const statuses = await getStatuses(page, command, week);
+  console.log(`STATUSES ${statuses.statusThis}`);
+
+  // get reply
+  let reply;
+  switch (week) {
+    case "this":
+      reply = statuses.statusThis.longStatus;
+      break;
+    case "next":
+      reply = statuses.statusNext.longStatus;
+      break;
+    case "nextnext":
+      reply = statuses.statusNextNext.longStatus;
+      break;
+    case undefined:
+      reply = `${className} on ${day} in ${location}:
+\n\nthis:\n${statuses.statusThis.shortStatus}
+\n\nnext:\n${statuses.statusNext.shortStatus}
+\n\nnextnext:\n${statuses.statusNextNext.shortStatus}`;
+      break;
+  }
+  return {
+    reply,
+    statuses,
+  };
+};
+
 const parseCommand = (command) => {
-  const commandParts = command.split("/");
-  if (commandParts.length !== 3) {
+  let commandParts = command.split("/");
+  if (commandParts.length === 3) {
+    commandParts.push(undefined);
+  }
+  if (
+    commandParts.length !== 4 ||
+    !["this", "next", "nextnext", undefined].includes(commandParts[3])
+  ) {
     throw `Cannot parse command '${command}'`;
   }
   return {
     location: commandParts[0],
     day: commandParts[1],
     className: commandParts[2],
+    week: commandParts[3],
   };
 };
 
@@ -130,4 +205,7 @@ module.exports = {
   getPage,
   getNextWeek,
   getStatus,
+  getStatuses,
+  getReplyAndShortStatuses,
+  parseCommand,
 };

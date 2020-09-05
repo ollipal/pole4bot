@@ -66,25 +66,16 @@ const help = (bot, msg) => {
 };
 
 const poll = async (bot, msg, browser) => {
-  const command = msg.text.split(" ")[1];
-  const status = await pole4info.getStatus(
-    await pole4info.getPage(browser),
-    command
+  const command = msg.text.substr(msg.text.indexOf(" ") + 1);
+  const { reply, statuses } = await pole4info.getReplyAndShortStatuses(
+    command,
+    browser
   );
-  await db.createPoll(msg.from.id, command, status);
-  bot.sendMessage(msg.chat.id, `Polling started for '${command}':\n${status}`);
+  await db.createPoll(msg.from.id, command, statuses);
+  bot.sendMessage(msg.chat.id, `Polling started for '${command}':\n${reply}`);
 };
 
 const reply = async (bot, msg, browser) => {
-  let page = await pole4info.getPage(browser);
-  const statusThisWeek = await pole4info.getStatus(page, msg.text);
-  page = await pole4info.getNextWeek(page);
-  const statusNextWeek = await pole4info.getStatus(page, msg.text);
-  page = await pole4info.getNextWeek(page);
-  const statusNextNextWeek = await pole4info.getStatus(page, msg.text);
-
-  bot.sendMessage(
-    msg.chat.id,
-    `${statusThisWeek}\n\n${statusNextWeek}\n\n${statusNextNextWeek}`
-  );
+  const { reply } = await pole4info.getReplyAndShortStatuses(msg.text, browser);
+  bot.sendMessage(msg.chat.id, reply);
 };
