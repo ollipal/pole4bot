@@ -56,14 +56,33 @@ const addUserIfNew = async (msg) => {
 };
 
 const start = async (bot, msg) => {
-  bot.sendMessage(msg.chat.id, "Welcome to pole4bot!");
+  bot.sendMessage(
+    msg.chat.id,
+    `Welcome to pole4bot!
+
+Through me you can check the status of classes on pole4fit: https://www.polenow.com/pole4fit/,
+and get informed when a class you are interested in has space left.`
+  );
   help(bot, msg);
 };
 
 const help = (bot, msg) => {
   bot.sendMessage(
     msg.chat.id,
-    `usage: \`location/day/className\`\nfor example: \`Pasila/Keskiviikko/Poletech 3\``,
+    `commands:
+/help: see this message
+/poll COMMAND: start polling the status of the class in command, and get informed whenever there is a status update
+/poll: see active polls with statuses
+/rm INDEX: remove an active poll with a certain index
+COMMAND: check class status
+
+COMMAND structure: \`location/day/className/[week]\`,
+where week is optional and should be one of the following: \`this, next, nextnext\`\\.
+If no week is given, all of the weeks are checked\\.
+
+for example:
+\`Pasila/Keskiviikko/Poletech 3\`
+\`Kamppi/Sunnuntai/Vapaatreenit/nextnext\``,
     { parse_mode: "MarkdownV2" }
   );
 };
