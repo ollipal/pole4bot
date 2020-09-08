@@ -1,6 +1,6 @@
 const pole4info = require("./pole4info");
 const db = require("./db");
-const POLLING_FREQ_MS = 10000;
+const POLLING_FREQ_MS = 1000 * 60 * 5;
 
 const startPolling = async (bot, browser) => {
   while (true) {
