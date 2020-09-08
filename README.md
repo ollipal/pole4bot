@@ -11,7 +11,8 @@ Add `@pole4bot` in Telegram for detailed instructions.
 
 ## Setup
 Create a `.env` file to `pole4bot/` with a Telegram bot token `BOT_TOKEN=...`
-that has been gotten from https://t.me/botfather . 
+that has been gotten from https://t.me/botfather . Optionally you can also set
+`ADMIN=...` user id variable, who is the user to which the polling errors are sent.
 
 Install Docker: https://docs.docker.com/get-docker/
 and Docker Compose: https://docs.docker.com/compose/install/

@@ -18,6 +18,11 @@ const startPolling = async (bot, browser) => {
       await pollMultiple(page, bot, polls, "nextnext");
     } catch (e) {
       console.warn(`Polling error: ${e}`);
+      if (process.env.ADMIN) {
+        bot.sendMessage(process.env.ADMIN, `ADMIN: Polling error: ${e}`);
+      } else {
+        console.log("ADMIN not set on .env, check the README");
+      }
     }
     await sleep(POLLING_FREQ_MS);
   }
