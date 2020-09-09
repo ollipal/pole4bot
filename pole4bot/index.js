@@ -14,6 +14,15 @@ const db = require("./src/db");
   const browser = await pole4info.getBrowser();
   polling.startPolling(bot, browser);
 
+  bot.on("polling_error", (msg) => {
+    console.log(msg);
+    if (process.env.ADMIN) {
+      bot.sendMessage(process.env.ADMIN, `ADMIN: polling_error: ${msg}`);
+    } else {
+      console.log("ADMIN not set on .env, check the README");
+    }
+  })();
+
   bot.on("message", (msg) => {
     (async () => {
       await addUserIfNew(msg);
