@@ -21,7 +21,7 @@ const db = require("./src/db");
     } else {
       console.log("ADMIN not set on .env, check the README");
     }
-  })();
+  });
 
   bot.on("message", (msg) => {
     (async () => {
