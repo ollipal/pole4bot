@@ -112,7 +112,7 @@ const showPolls = async (bot, user) => {
   if (reply === "Polls:\n") {
     reply = "No active polls";
   }
-  bot.sendMessage(user, reply);
+  bot.sendMessage(user, `${reply}`);
 };
 
 const createPoll = async (command, user, bot, browser) => {

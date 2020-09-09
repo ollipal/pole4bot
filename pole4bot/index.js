@@ -46,7 +46,7 @@ const db = require("./src/db");
         }
       } catch (e) {
         console.log(e);
-        bot.sendMessage(msg.chat.id, e);
+        bot.sendMessage(msg.chat.id, `${e}`);
         help(bot, msg);
       }
     })();
@@ -117,5 +117,5 @@ const rm = async (bot, msg, browser) => {
 
 const reply = async (bot, msg, browser) => {
   const { reply } = await pole4info.getReplyAndStatuses(msg.text, browser);
-  bot.sendMessage(msg.chat.id, reply);
+  bot.sendMessage(msg.chat.id, `${reply}`);
 };
